@@ -761,4 +761,6 @@ npx homeassistant-mcp
 ```
 
 ### Advanced Usage
-# advanced-homeassistant-mcp
+<<<<<<< HEAD
+=======
+>>>>>>> 2368a39d11626bf875840aa515efadbc7bad8c4d
