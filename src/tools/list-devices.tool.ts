@@ -2,6 +2,7 @@ import { z } from "zod";
 import { Tool } from "../types/index.js";
 import { APP_CONFIG } from "../config/app.config.js";
 import { HassState } from "../types/index.js";
+import { logger } from "../utils/logger.js";
 
 export const listDevicesTool: Tool = {
   name: "list_devices",
@@ -110,7 +111,7 @@ export const listDevicesTool: Tool = {
         device_summary: deviceSummary
       };
     } catch (error) {
-      console.error('Error in list devices tool:', error);
+      logger.error('Error in list devices tool:', error);
       return {
         success: false,
         message: error instanceof Error ? error.message : "Unknown error occurred",

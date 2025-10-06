@@ -225,6 +225,64 @@ export class MCPServer extends EventEmitter {
     private async executeRequest(request: MCPRequest, context: MCPContext): Promise<MCPResponse> {
         const { method, params = {} } = request;
 
+        // Handle MCP protocol methods
+        if (method === "initialize") {
+            return {
+                id: request.id,
+                result: {
+                    protocolVersion: params.protocolVersion || "2025-06-18",
+                    capabilities: {
+                        tools: {}
+                    },
+                    serverInfo: {
+                        name: "Home Assistant Model Context Protocol Server",
+                        version: "1.0.0"
+                    }
+                }
+            };
+        }
+
+        if (method === "notifications/initialized") {
+            // This is a notification, no response needed
+            // Notifications don't have responses in JSON-RPC 2.0
+            return { id: undefined } as MCPResponse;
+        }
+
+        if (method === "tools/list") {
+            return {
+                id: request.id,
+                result: {
+                    tools: Array.from(this.tools.values()).map(tool => ({
+                        name: tool.name,
+                        description: tool.description,
+                        inputSchema: {
+                            type: 'object',
+                            properties: {},
+                            additionalProperties: true
+                        }
+                    }))
+                }
+            };
+        }
+
+        if (method === "prompts/list") {
+            return {
+                id: request.id,
+                result: {
+                    prompts: []
+                }
+            };
+        }
+
+        if (method === "resources/list") {
+            return {
+                id: request.id,
+                result: {
+                    resources: []
+                }
+            };
+        }
+
         // Special case for internal context retrieval (used by transports for initialization)
         if (method === "_internal_getContext") {
             return {
@@ -240,7 +298,20 @@ export class MCPServer extends EventEmitter {
             };
         }
 
-        const tool = this.tools.get(method);
+        // Handle tool calls - MCP uses tools/call with tool name in params
+        let toolMethod = method;
+        let toolParams = params;
+
+        if (method === "tools/call") {
+            // Extract tool name from params
+            toolMethod = params.name;
+            toolParams = params.arguments || params.params || {};
+        } else if (method.startsWith("tools/call/")) {
+            // Also support tools/call/toolname format
+            toolMethod = method.replace("tools/call/", "");
+        }
+
+        const tool = this.tools.get(toolMethod);
         if (!tool) {
             return {
                 id: request.id,
@@ -252,7 +323,7 @@ export class MCPServer extends EventEmitter {
         }
 
         try {
-            const result = await tool.execute(params, context);
+            const result = await tool.execute(toolParams, context);
             return {
                 id: request.id,
                 result
@@ -278,6 +349,20 @@ export class MCPServer extends EventEmitter {
         next: () => Promise<MCPResponse>
     ): Promise<MCPResponse> {
         const { method, params = {} } = request;
+
+        // Skip validation for MCP protocol methods
+        const protocolMethods = [
+            'initialize',
+            'notifications/initialized',
+            'tools/list',
+            'tools/call',
+            'prompts/list',
+            'resources/list',
+            '_internal_getContext'
+        ];
+        if (protocolMethods.includes(method) || method.startsWith('tools/call/') || method.startsWith('notifications/')) {
+            return next();
+        }
 
         const tool = this.tools.get(method);
         if (!tool) {

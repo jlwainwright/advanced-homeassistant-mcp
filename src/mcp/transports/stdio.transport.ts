@@ -250,7 +250,10 @@ export class StdioTransport extends BaseTransport {
             // Delegate to the server to handle the request
             if (this.handler) {
                 const response = await this.handler(mcpRequest);
-                this.sendResponse(response);
+                // Don't send responses for notifications (they don't have an id)
+                if (response.id !== undefined) {
+                    this.sendResponse(response);
+                }
             }
 
         } catch (error) {

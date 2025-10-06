@@ -2,6 +2,7 @@ import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { Tool, SSEParams } from "../types/index.js";
 import { sseManager } from "../sse/index.js";
+import { logger } from "../utils/logger.js";
 
 export const subscribeEventsTool: Tool = {
   name: "subscribe_events",
@@ -58,7 +59,7 @@ export const subscribeEventsTool: Tool = {
 
     // Subscribe to specific events if provided
     if (params.events?.length) {
-      console.log(`Client ${clientId} subscribing to events:`, params.events);
+      logger.info(`Client ${clientId} subscribing to events:`, params.events);
       for (const eventType of params.events) {
         sseManager.subscribeToEvent(clientId, eventType);
       }
@@ -66,7 +67,7 @@ export const subscribeEventsTool: Tool = {
 
     // Subscribe to specific entity if provided
     if (params.entity_id) {
-      console.log(
+      logger.info(
         `Client ${clientId} subscribing to entity:`,
         params.entity_id,
       );
@@ -75,7 +76,7 @@ export const subscribeEventsTool: Tool = {
 
     // Subscribe to domain if provided
     if (params.domain) {
-      console.log(`Client ${clientId} subscribing to domain:`, params.domain);
+      logger.info(`Client ${clientId} subscribing to domain:`, params.domain);
       sseManager.subscribeToDomain(clientId, params.domain);
     }
 

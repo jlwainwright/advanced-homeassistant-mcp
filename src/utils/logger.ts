@@ -11,7 +11,7 @@ import path from 'path';
 import fs from 'fs';
 
 // Ensure logs directory exists
-const logsDir = path.join(process.cwd(), 'logs');
+const logsDir = process.env.LOG_DIR || path.join(process.cwd(), 'logs');
 if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });
 }
@@ -40,25 +40,23 @@ const logger = winston.createLogger({
 });
 
 // Handle console output based on environment
-if (process.env.NODE_ENV !== 'production' || process.env.CONSOLE_LOGGING === 'true') {
-  // In stdio mode with debug enabled, ensure logs only go to stderr to keep stdout clean for JSON-RPC
-  if (isStdioMode && isDebugStdio) {
-    // Use stderr stream transport in stdio debug mode
-    logger.add(new winston.transports.Stream({
-      stream: process.stderr,
-      format: winston.format.combine(
-        winston.format.simple()
-      )
-    }));
-  } else {
-    // Use console transport in normal mode
-    logger.add(new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      )
-    }));
-  }
+// In stdio mode, NEVER use console/stdout to avoid breaking JSON-RPC
+if (!isStdioMode && (process.env.NODE_ENV !== 'production' || process.env.CONSOLE_LOGGING === 'true')) {
+  // Use console transport in normal mode (not stdio)
+  logger.add(new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.simple()
+    )
+  }));
+} else if (isStdioMode && isDebugStdio) {
+  // In stdio debug mode, use stderr stream (keeps stdout clean for JSON-RPC)
+  logger.add(new winston.transports.Stream({
+    stream: process.stderr,
+    format: winston.format.combine(
+      winston.format.simple()
+    )
+  }));
 }
 
 // Custom logger interface

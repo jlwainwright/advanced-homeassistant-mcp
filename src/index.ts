@@ -10,7 +10,7 @@ import { MCPServer } from './mcp/MCPServer.js';
 import { loggingMiddleware, timeoutMiddleware } from './mcp/middleware/index.js';
 import { StdioTransport } from './mcp/transports/stdio.transport.js';
 import { HttpTransport } from './mcp/transports/http.transport.js';
-import { APP_CONFIG } from './config.js';
+import { APP_CONFIG } from './config';
 import { logger } from "./utils/logger.js";
 import { openApiConfig } from './openapi.js';
 import { apiLimiter, authLimiter } from './middleware/rate-limit.middleware.js';
@@ -21,8 +21,15 @@ import { LightsControlTool } from './tools/homeassistant/lights.tool.js';
 import { ClimateControlTool } from './tools/homeassistant/climate.tool.js';
 
 // Home Assistant optional tools - these can be added as needed
-// import { ControlTool } from './tools/control.tool.js';
-// import { SceneTool } from './tools/scene.tool.js';
+import { controlTool } from './tools/control.tool.js';
+import { sceneTool } from './tools/scene.tool.js';
+import { notifyTool } from './tools/notify.tool.js';
+import { listDevicesTool } from './tools/list-devices.tool.js';
+import { historyTool } from './tools/history.tool.js';
+import { automationTool } from './tools/automation.tool.js';
+import { addonTool } from './tools/addon.tool.js';
+import { packageTool } from './tools/package.tool.js';
+import { automationConfigTool } from './tools/automation-config.tool.js';
 // import { AutomationTool } from './tools/automation.tool.js';
 // import { NotifyTool } from './tools/notify.tool.js';
 // import { ListDevicesTool } from './tools/list-devices.tool.js';
@@ -56,11 +63,15 @@ async function main() {
   server.registerTool(new ClimateControlTool());
 
   // Add optional tools here as needed
-  // server.registerTool(new ControlTool());
-  // server.registerTool(new SceneTool());
-  // server.registerTool(new NotifyTool());
-  // server.registerTool(new ListDevicesTool());
-  // server.registerTool(new HistoryTool());
+  server.registerTool(controlTool);
+  server.registerTool(sceneTool);
+  server.registerTool(notifyTool);
+  server.registerTool(listDevicesTool);
+  server.registerTool(historyTool);
+  server.registerTool(automationTool);
+  server.registerTool(addonTool);
+  server.registerTool(packageTool);
+  server.registerTool(automationConfigTool);
 
   // Add middlewares
   server.use(loggingMiddleware);
