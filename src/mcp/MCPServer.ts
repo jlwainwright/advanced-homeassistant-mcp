@@ -10,6 +10,8 @@ import { EventEmitter } from "events";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { logger } from "../utils/logger.js";
+import { zodToMCPInputSchema } from "./utils/schema-converter.js";
+import { formatToolResult, isErrorResult } from "./utils/tool-result.js";
 
 // Error code enum to break circular dependency
 export enum MCPErrorCode {
@@ -230,9 +232,11 @@ export class MCPServer extends EventEmitter {
             return {
                 id: request.id,
                 result: {
-                    protocolVersion: params.protocolVersion || "2025-06-18",
+                    protocolVersion: params.protocolVersion || "2024-11-05",
                     capabilities: {
-                        tools: {}
+                        tools: {
+                            listChanged: true
+                        }
                     },
                     serverInfo: {
                         name: "Home Assistant Model Context Protocol Server",
@@ -254,12 +258,8 @@ export class MCPServer extends EventEmitter {
                 result: {
                     tools: Array.from(this.tools.values()).map(tool => ({
                         name: tool.name,
-                        description: tool.description,
-                        inputSchema: {
-                            type: 'object',
-                            properties: {},
-                            additionalProperties: true
-                        }
+                        description: tool.description || "",
+                        inputSchema: zodToMCPInputSchema(tool.parameters)
                     }))
                 }
             };
@@ -317,25 +317,47 @@ export class MCPServer extends EventEmitter {
                 id: request.id,
                 error: {
                     code: MCPErrorCode.METHOD_NOT_FOUND,
-                    message: `Method not found: ${method}`
+                    message: `Tool not found: ${toolMethod}`
                 }
             };
         }
 
         try {
+            // Validate parameters using Zod schema if available
+            if (tool.parameters) {
+                try {
+                    toolParams = tool.parameters.parse(toolParams);
+                } catch (validationError) {
+                    // Return validation error as tool error (not protocol error)
+                    const errorMessage = validationError instanceof z.ZodError
+                        ? `Invalid parameters: ${validationError.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`
+                        : `Parameter validation failed: ${validationError instanceof Error ? validationError.message : String(validationError)}`;
+                    
+                    return {
+                        id: request.id,
+                        result: formatToolResult({ error: errorMessage }, true)
+                    };
+                }
+            }
+
+            // Execute the tool
             const result = await tool.execute(toolParams, context);
+            
+            // Convert result to MCP-compliant format
+            const mcpResult = formatToolResult(result, isErrorResult(result));
+            
             return {
                 id: request.id,
-                result
+                result: mcpResult
             };
         } catch (error) {
-            logger.error(`Error executing tool ${method}:`, error);
+            logger.error(`Error executing tool ${toolMethod}:`, error);
+            
+            // Return error as tool result with isError flag (per MCP spec)
+            const errorMessage = error instanceof Error ? error.message : String(error);
             return {
                 id: request.id,
-                error: {
-                    code: MCPErrorCode.TOOL_EXECUTION_ERROR,
-                    message: error instanceof Error ? error.message : String(error)
-                }
+                result: formatToolResult({ error: errorMessage }, true)
             };
         }
     }

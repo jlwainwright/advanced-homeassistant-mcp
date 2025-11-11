@@ -90,6 +90,128 @@ SILENT_STARTUP=false
 CORS_ORIGIN=*
 ```
 
+## MCP Protocol Compliance
+
+This server is fully compliant with the **Model Context Protocol specification version 2024-11-05**. It implements:
+
+- ✅ **Proper Tool Schemas**: All tools expose complete JSON Schema definitions via `tools/list`
+- ✅ **MCP-Compliant Results**: Tool results follow the MCP format with `content` array and `isError` flag
+- ✅ **Protocol Version**: Uses MCP protocol version 2024-11-05
+- ✅ **Capabilities**: Declares `tools.listChanged` capability for dynamic tool updates
+- ✅ **Error Handling**: Proper separation between protocol errors and tool execution errors
+
+### Tool Schema Conversion
+
+The server automatically converts Zod schemas to JSON Schema format, ensuring all tool parameters are properly documented and validated. This includes support for:
+
+- Basic types (string, number, boolean)
+- Arrays and tuples
+- Enums and unions
+- Nested objects
+- Optional fields
+- Field descriptions
+
+## Client Setup Instructions
+
+### Claude Desktop
+
+Add the following to your Claude Desktop configuration file:
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "homeassistant": {
+      "command": "bun",
+      "args": ["run", "/path/to/advanced-homeassistant-mcp/dist/stdio-server.js"],
+      "env": {
+        "HASS_TOKEN": "your_long_lived_access_token",
+        "HASS_HOST": "https://your-home-assistant-instance.local:8123",
+        "USE_STDIO_TRANSPORT": "true"
+      }
+    }
+  }
+}
+```
+
+### Cursor IDE
+
+Add to your Cursor configuration (`.cursor/config/config.json` or workspace settings):
+
+```json
+{
+  "mcpServers": {
+    "homeassistant-mcp": {
+      "command": "bun",
+      "args": ["run", "/path/to/advanced-homeassistant-mcp/dist/stdio-server.js"],
+      "env": {
+        "HASS_TOKEN": "your_long_lived_access_token",
+        "HASS_HOST": "https://your-home-assistant-instance.local:8123",
+        "USE_STDIO_TRANSPORT": "true",
+        "DEBUG_STDIO": "false"
+      }
+    }
+  }
+}
+```
+
+### VS Code (with MCP Extension)
+
+If using a VS Code MCP extension, configure it similarly:
+
+```json
+{
+  "mcp.servers": {
+    "homeassistant": {
+      "command": "bun",
+      "args": ["run", "/path/to/advanced-homeassistant-mcp/dist/stdio-server.js"],
+      "env": {
+        "HASS_TOKEN": "your_long_lived_access_token",
+        "HASS_HOST": "https://your-home-assistant-instance.local:8123"
+      }
+    }
+  }
+}
+```
+
+### Getting Your Home Assistant Token
+
+1. Open Home Assistant in your browser
+2. Go to your **Profile** (click your user icon in the bottom left)
+3. Scroll down to **Long-Lived Access Tokens**
+4. Click **Create Token**
+5. Give it a name (e.g., "MCP Server")
+6. Copy the token immediately (you won't be able to see it again)
+
+### Verifying the Setup
+
+After configuring your client, you should be able to:
+
+1. **List available tools**: The client should discover all Home Assistant tools
+2. **See tool parameters**: Each tool should show its required and optional parameters
+3. **Execute tools**: You should be able to call tools like `list_devices`, `control`, etc.
+
+### Troubleshooting
+
+**Tools not appearing:**
+- Verify the server builds successfully: `bun run build:all`
+- Check that environment variables are set correctly
+- Ensure the path to `stdio-server.js` is correct
+- Check client logs for connection errors
+
+**Tool execution fails:**
+- Verify your Home Assistant token is valid
+- Check that `HASS_HOST` is accessible from your machine
+- Ensure Home Assistant API is enabled
+- Review server logs for detailed error messages
+
+**Schema issues:**
+- All tools should have proper `inputSchema` definitions
+- If schemas appear empty, rebuild the server: `bun run build:all`
+- Check that `zod-to-json-schema` is installed: `bun install`
+
 ## Architecture
 
 The MCP server is built with a layered architecture:

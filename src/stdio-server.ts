@@ -14,10 +14,20 @@ import { createStdioServer, BaseTool } from "./mcp/index.js";
 import { z } from "zod";
 import { logger } from "./utils/logger.js";
 import { MCPContext } from "./mcp/types.js";
+import { zodToMCPInputSchema } from "./mcp/utils/schema-converter.js";
 
 // Import Home Assistant tools
 import { LightsControlTool } from './tools/homeassistant/lights.tool.js';
 import { ClimateControlTool } from './tools/homeassistant/climate.tool.js';
+import { controlTool } from './tools/control.tool.js';
+import { sceneTool } from './tools/scene.tool.js';
+import { notifyTool } from './tools/notify.tool.js';
+import { listDevicesTool } from './tools/list-devices.tool.js';
+import { historyTool } from './tools/history.tool.js';
+import { automationTool } from './tools/automation.tool.js';
+import { addonTool } from './tools/addon.tool.js';
+import { packageTool } from './tools/package.tool.js';
+import { automationConfigTool } from './tools/automation-config.tool.js';
 
 // Check for Cursor compatibility mode
 const isCursorMode = process.env.CURSOR_COMPATIBLE === 'true';
@@ -53,7 +63,9 @@ function sendNotification(method: string, params: any): void {
 
 // Create system tools
 class InfoTool extends BaseTool {
-    constructor() {
+    private readonly homeAssistantToolNames: string[];
+
+    constructor(homeAssistantToolNames: string[]) {
         super({
             name: "system_info",
             description: "Get information about the Home Assistant MCP server",
@@ -64,6 +76,7 @@ class InfoTool extends BaseTool {
                 tags: ["system", "info"]
             }
         });
+        this.homeAssistantToolNames = homeAssistantToolNames;
     }
 
     execute(_params: any, _context: MCPContext): any {
@@ -76,8 +89,8 @@ class InfoTool extends BaseTool {
             timestamp: new Date().toISOString(),
             homeAssistant: {
                 available: true,
-                toolCount: 2,
-                toolNames: ["lights_control", "climate_control"]
+                toolCount: this.homeAssistantToolNames.length,
+                toolNames: this.homeAssistantToolNames
             }
         };
     }
@@ -85,15 +98,26 @@ class InfoTool extends BaseTool {
 
 async function main() {
     try {
-        // Create system tools
-        const systemTools = [
-            new InfoTool()
-        ];
-
         // Create Home Assistant tools
         const haTools = [
             new LightsControlTool(),
-            new ClimateControlTool()
+            new ClimateControlTool(),
+            controlTool,
+            sceneTool,
+            notifyTool,
+            listDevicesTool,
+            historyTool,
+            automationTool,
+            addonTool,
+            packageTool,
+            automationConfigTool
+        ];
+
+        const homeAssistantToolNames = haTools.map((tool) => tool.name);
+
+        // Create system tools
+        const systemTools = [
+            new InfoTool(homeAssistantToolNames)
         ];
 
         // Combine all tools
@@ -110,15 +134,11 @@ async function main() {
             timestamp: new Date().toISOString()
         });
 
-        // Send available tools
+        // Send available tools with proper schemas
         const toolDefinitions = allTools.map(tool => ({
             name: tool.name,
-            description: tool.description,
-            parameters: {
-                type: "object",
-                properties: {},
-                required: []
-            },
+            description: tool.description || "",
+            inputSchema: zodToMCPInputSchema(tool.parameters),
             metadata: tool.metadata
         }));
 

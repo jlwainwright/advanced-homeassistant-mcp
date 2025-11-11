@@ -11,6 +11,7 @@ import { logger } from "../../utils/logger.js";
 import { MCPServer } from "../MCPServer.js";
 import type { MCPRequest, MCPResponse, ToolExecutionResult } from "../types.js";
 import { JSONRPCError } from "../utils/error.js";
+import { zodToMCPInputSchema } from "../utils/schema-converter.js";
 
 /**
  * StdioTransport options
@@ -113,15 +114,10 @@ export class StdioTransport extends BaseTransport {
         }
 
         const tools = this.server.getAllTools().map(tool => {
-            // For parameters, create a simple JSON schema or empty object
-            const parameters = tool.parameters
-                ? { type: 'object', properties: {} } // Simplified schema
-                : { type: 'object', properties: {} };
-
             return {
                 name: tool.name,
-                description: tool.description,
-                parameters,
+                description: tool.description || "",
+                inputSchema: zodToMCPInputSchema(tool.parameters),
                 metadata: tool.metadata
             };
         });
