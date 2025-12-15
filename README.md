@@ -276,64 +276,11 @@ const response = await claude.messages.create({
 });
 ```
 
-### Cursor Integration
+### Legacy Cursor Integration (Deprecated)
 
-To use the Home Assistant MCP server with Cursor, add the following to your `.cursor/config/config.json` file:
+> **Note**: The configuration below is deprecated. Use the [Cursor IDE setup](#cursor-ide) above instead, which uses the dedicated `stdio-server.js` entry point.
 
-```json
-{
-  "mcpServers": {
-    "homeassistant-mcp": {
-      "command": "bash",
-      "args": ["-c", "cd ${workspaceRoot} && bun run dist/index.js --stdio 2>/dev/null | grep -E '\\{\"jsonrpc\":\"2\\.0\"'"],
-      "env": {
-        "NODE_ENV": "development",
-        "USE_STDIO_TRANSPORT": "true",
-        "DEBUG_STDIO": "true"
-      }
-    }
-  }
-}
-```
-
-This configuration:
-1. Runs the MCP server with stdio transport
-2. Redirects all stderr output to /dev/null
-3. Uses grep to filter stdout for lines containing `{"jsonrpc":"2.0"`, ensuring clean JSON-RPC output
-
-#### Troubleshooting Cursor Integration
-
-If you encounter a "failed to create client" error when using the MCP server with Cursor:
-
-1. Make sure you're using the correct command and arguments in your Cursor configuration
-   - The bash script approach ensures only valid JSON-RPC messages reach Cursor
-   - Ensure the server is built by running `bun run build` before trying to connect
-
-2. Ensure the server is properly outputting JSON-RPC messages to stdout:
-   ```bash
-   bun run dist/index.js --stdio 2>/dev/null | grep -E '\{"jsonrpc":"2\.0"' > json_only.txt
-   ```
-   Then examine json_only.txt to verify it contains only valid JSON-RPC messages.
-
-3. Make sure grep is installed on your system (it should be available by default on most systems)
-
-4. Try rebuilding the server with:
-   ```bash
-   bun run build
-   ```
-   
-5. Enable debug mode by setting `DEBUG_STDIO=true` in the environment variables
-
-If the issue persists, you can try:
-1. Restarting Cursor
-2. Clearing Cursor's cache (Help > Developer > Clear Cache and Reload)
-3. Using a similar approach with Node.js:
-   ```json
-   {
-     "command": "bash",
-     "args": ["-c", "cd ${workspaceRoot} && node dist/index.js --stdio 2>/dev/null | grep -E '\\{\"jsonrpc\":\"2\\.0\"'"]
-   }
-   ```
+The old configuration used `index.js --stdio` with grep filtering. This still works but is not recommended. Use `stdio-server.js` instead for better performance and cleaner output.
 
 ## License
 
@@ -548,7 +495,7 @@ Add to `.cursor/config/config.json`:
   "mcpServers": {
     "homeassistant-mcp": {
       "command": "bash",
-      "args": ["-c", "cd ${workspaceRoot} && bun run dist/index.js --stdio 2>/dev/null | grep -E '\\{\"jsonrpc\":\"2\\.0\"'"],
+      "args": ["run", "/path/to/advanced-homeassistant-mcp/dist/stdio-server.js"],
       "env": {
         "NODE_ENV": "development",
         "USE_STDIO_TRANSPORT": "true",
@@ -560,15 +507,16 @@ Add to `.cursor/config/config.json`:
 ```
 
 ### Claude Desktop 💬
-Add to your Claude config:
+Add to your Claude config (see [Client Setup Instructions](#client-setup-instructions) for details):
 ```json
 {
   "mcpServers": {
-    "homeassistant-mcp": {
+    "homeassistant": {
       "command": "bun",
-      "args": ["run", "start", "--port", "8080"],
+      "args": ["run", "/path/to/advanced-homeassistant-mcp/dist/stdio-server.js"],
       "env": {
-        "NODE_ENV": "production"
+        "HASS_TOKEN": "your_long_lived_access_token",
+        "HASS_HOST": "https://your-home-assistant-instance.local:8123"
       }
     }
   }

@@ -1,0 +1,173 @@
+{
+  "timestamp": "2025-11-11T07:36:25.545Z",
+  "entities": [
+    {
+      "entity_id": "input_number.wellpoint_runtime",
+      "state": "1.0",
+      "attributes": {
+        "initial": null,
+        "editable": false,
+        "min": 0,
+        "max": 60,
+        "step": 1,
+        "mode": "slider",
+        "friendly_name": "WellPoint Run Time"
+      },
+      "last_changed": "2025-10-29T12:26:29.357872+00:00",
+      "last_reported": "2025-10-29T12:26:29.357872+00:00",
+      "last_updated": "2025-10-29T12:26:29.357872+00:00",
+      "context": {
+        "id": "01K8QYY5KDCPX167K016T7AF93",
+        "parent_id": null,
+        "user_id": null
+      }
+    },
+    {
+      "entity_id": "switch.wellpump_wellpump_relay",
+      "state": "unavailable",
+      "attributes": {
+        "friendly_name": "Well Pump Wellpump Relay"
+      },
+      "last_changed": "2025-10-29T12:26:39.487046+00:00",
+      "last_reported": "2025-10-29T12:26:39.487046+00:00",
+      "last_updated": "2025-10-29T12:26:39.487046+00:00",
+      "context": {
+        "id": "01K8QYYFFZ5BSA087PMNR9MJQ9",
+        "parent_id": null,
+        "user_id": null
+      }
+    },
+    {
+      "entity_id": "binary_sensor.wellpump_wellpump_button",
+      "state": "unavailable",
+      "attributes": {
+        "friendly_name": "Well Pump Wellpump Button"
+      },
+      "last_changed": "2025-10-29T12:26:39.487195+00:00",
+      "last_reported": "2025-10-29T12:26:39.487195+00:00",
+      "last_updated": "2025-10-29T12:26:39.487195+00:00",
+      "context": {
+        "id": "01K8QYYFFZ50XGNS7933411Z5A",
+        "parent_id": null,
+        "user_id": null
+      }
+    },
+    {
+      "entity_id": "switch.wellpoint_pump_relay",
+      "state": "unavailable",
+      "attributes": {
+        "friendly_name": "Device0dcc84 Wellpoint Pump Relay"
+      },
+      "last_changed": "2025-10-29T12:26:39.501636+00:00",
+      "last_reported": "2025-10-29T12:26:39.501636+00:00",
+      "last_updated": "2025-10-29T12:26:39.501636+00:00",
+      "context": {
+        "id": "01K8QYYFGDGQMX5N7NW41F94D5",
+        "parent_id": null,
+        "user_id": null
+      }
+    },
+    {
+      "entity_id": "sensor.jojopump_temperature",
+      "state": "unavailable",
+      "attributes": {
+        "state_class": "measurement",
+        "unit_of_measurement": "°C",
+        "device_class": "temperature",
+        "friendly_name": "jojopump Temperature"
+      },
+      "last_changed": "2025-11-07T15:13:20.703315+00:00",
+      "last_reported": "2025-11-07T15:13:20.703315+00:00",
+      "last_updated": "2025-11-07T15:13:20.703315+00:00",
+      "context": {
+        "id": "01K9FE259ZXEZFQZWRE4KWJKPG",
+        "parent_id": null,
+        "user_id": null
+      }
+    },
+    {
+      "entity_id": "sensor.jojopump_humidity",
+      "state": "unavailable",
+      "attributes": {
+        "state_class": "measurement",
+        "unit_of_measurement": "%",
+        "device_class": "humidity",
+        "friendly_name": "jojopump Humidity"
+      },
+      "last_changed": "2025-11-07T15:13:20.703132+00:00",
+      "last_reported": "2025-11-07T15:13:20.703132+00:00",
+      "last_updated": "2025-11-07T15:13:20.703132+00:00",
+      "context": {
+        "id": "01K9FE259ZWE0T4G6TWNGWM2EZ",
+        "parent_id": null,
+        "user_id": null
+      }
+    },
+    {
+      "entity_id": "switch.jojopump_relay",
+      "state": "unavailable",
+      "attributes": {
+        "friendly_name": "jojopump Relay"
+      },
+      "last_changed": "2025-11-07T15:13:20.703238+00:00",
+      "last_reported": "2025-11-07T15:13:20.703238+00:00",
+      "last_updated": "2025-11-07T15:13:20.703238+00:00",
+      "context": {
+        "id": "01K9FE259ZVYA17X0MGC7K97WS",
+        "parent_id": null,
+        "user_id": null
+      }
+    },
+    {
+      "entity_id": "binary_sensor.jojopump_button",
+      "state": "unavailable",
+      "attributes": {
+        "friendly_name": "jojopump Button"
+      },
+      "last_changed": "2025-11-07T15:13:20.702839+00:00",
+      "last_reported": "2025-11-07T15:13:20.702839+00:00",
+      "last_updated": "2025-11-07T15:13:20.702839+00:00",
+      "context": {
+        "id": "01K9FE259Y021BC2P1J8EP2FHB",
+        "parent_id": null,
+        "user_id": null
+      }
+    },
+    {
+      "entity_id": "automation.stop_wellpump_when_jojo_level_is_above_55",
+      "state": "on",
+      "attributes": {
+        "id": "1705480600639",
+        "last_triggered": "2024-04-10T12:19:56.259995+00:00",
+        "mode": "single",
+        "current": 0,
+        "friendly_name": "Stop Wellpump When JoJo Level is Set Max %"
+      },
+      "last_changed": "2025-10-29T12:26:41.569604+00:00",
+      "last_reported": "2025-10-29T12:26:41.569604+00:00",
+      "last_updated": "2025-10-29T12:26:41.569604+00:00",
+      "context": {
+        "id": "01K8QYYHH18CDHN4DE4B2DCVH7",
+        "parent_id": null,
+        "user_id": null
+      }
+    }
+  ],
+  "devices": [
+    {
+      "entry_id": "18266acb665b2894a454f87625f01676",
+      "title": "WellPump",
+      "reason": "Replaced with Sonoff eWeLink device"
+    },
+    {
+      "entry_id": "01JGKWR7TGDSMXYTJEBBAXJHCB",
+      "title": "WellPointPump",
+      "reason": "Replaced with Sonoff eWeLink device"
+    },
+    {
+      "entry_id": "01JGM44C7GM13SCFQF874478WR",
+      "title": "jojopump",
+      "reason": "Replaced with Sonoff eWeLink device"
+    }
+  ]
+}

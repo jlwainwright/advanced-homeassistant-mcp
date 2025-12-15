@@ -1,0 +1,28 @@
+apiVersion: mcp.docker.com/v1alpha1
+kind: Catalog
+metadata:
+  name: HomeAssistCatalog
+servers:
+  - name: homeassistant-mcp # Using name as the primary identifier
+    image: homeassistant-mcp:latest
+    type: server
+    meta:
+      category: home-automation
+      tags:
+        - homeassistant
+        - iot
+    about:
+      title: Home Assistant MCP
+      description: Control Home Assistant via Model Context Protocol.
+    config:
+      secrets:
+        - name: HASS_TOKEN
+          env: HASS_TOKEN
+          description: Long-lived access token for Home Assistant
+          required: true
+          example: <YOUR_LONG_LIVED_TOKEN>
+      env:
+        - name: HASS_HOST
+          value: http://homeassistant.local:8123
+          description: URL of Home Assistant instance
+          required: true

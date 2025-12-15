@@ -1,0 +1,8 @@
+{
+  "threshold_days": 30,
+  "total_stale": 0,
+  "by_domain": {},
+  "by_issue": {},
+  "oldest": null,
+  "sample_stale": []
+}

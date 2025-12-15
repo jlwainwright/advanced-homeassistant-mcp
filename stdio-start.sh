@@ -73,7 +73,7 @@ fi
 # Check if we need to build
 if [ ! -d "dist" ] || [ "$REBUILD" = true ]; then
   echo -e "${BLUE}Building MCP server with stdio transport...${NC}" >&2
-  bun build ./src/index.ts --outdir ./dist --target bun || {
+  bun build ./src/stdio-server.ts --outdir ./dist --target bun || {
     echo -e "${RED}Build failed!${NC}" >&2
     exit 1
   }
@@ -90,8 +90,13 @@ echo -e "${GREEN}Starting MCP server with stdio transport...${NC}" >&2
 echo -e "${YELLOW}Note: All logs will be written to logs/ directory${NC}" >&2
 echo -e "${YELLOW}Press Ctrl+C to stop${NC}" >&2
 
-# Execute the server
-exec bun run dist/index.js
+# Execute the server (prefer stdio-server.js for optimal performance)
+if [ -f "dist/stdio-server.js" ]; then
+  exec bun run dist/stdio-server.js
+else
+  echo -e "${YELLOW}Warning: stdio-server.js not found, falling back to index.js${NC}" >&2
+  exec bun run dist/index.js
+fi
 
 # The exec replaces this shell with the server process
 # so any code after this point will not be executed 

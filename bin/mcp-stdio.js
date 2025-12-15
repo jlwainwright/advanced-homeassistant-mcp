@@ -23,8 +23,16 @@ try {
         fs.mkdirSync(logsDir, { recursive: true });
     }
 
-    // Get the entry module path
-    const entryPath = require.resolve('../dist/index.js');
+    // Get the entry module path - prefer stdio-server.js for optimal performance
+    const stdioServerPath = path.resolve(__dirname, '../dist/stdio-server.js');
+    const entryPath = fs.existsSync(stdioServerPath) 
+        ? stdioServerPath 
+        : require.resolve('../dist/index.js');
+    
+    if (!fs.existsSync(stdioServerPath)) {
+        console.warn('Warning: stdio-server.js not found, falling back to index.js');
+        console.warn('For optimal performance, build with "bun run build:all"');
+    }
 
     // Print initial message to stderr
     console.error('Starting MCP server in stdio transport mode...');

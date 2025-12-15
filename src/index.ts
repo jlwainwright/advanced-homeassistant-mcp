@@ -30,10 +30,6 @@ import { automationTool } from './tools/automation.tool.js';
 import { addonTool } from './tools/addon.tool.js';
 import { packageTool } from './tools/package.tool.js';
 import { automationConfigTool } from './tools/automation-config.tool.js';
-// import { AutomationTool } from './tools/automation.tool.js';
-// import { NotifyTool } from './tools/notify.tool.js';
-// import { ListDevicesTool } from './tools/list-devices.tool.js';
-// import { HistoryTool } from './tools/history.tool.js';
 
 /**
  * Check if running in stdio mode via command line args

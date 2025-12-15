@@ -69,7 +69,8 @@ class InfoTool extends BaseTool {
         super({
             name: "system_info",
             description: "Get information about the Home Assistant MCP server",
-            parameters: z.object({}).optional(),
+            // Use an empty object schema; optional() produced an anyOf schema that some clients reject
+            parameters: z.object({}),
             metadata: {
                 category: "system",
                 version: "1.0.0",

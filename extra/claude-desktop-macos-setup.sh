@@ -276,9 +276,10 @@ EOL
     CONFIG_JSON='{
       "mcpServers": {
         "homeassistant": {
-          "command": "node",
+          "command": "bun",
           "args": [
-            "'$MCP_DIR'/homeassistant-mcp/dist/index.js"
+            "run",
+            "'$MCP_DIR'/homeassistant-mcp/dist/stdio-server.js"
           ],
           "env": {
             "HASS_TOKEN": "'$HASS_TOKEN'",
@@ -321,7 +322,7 @@ read -p "Would you like to test the installations? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo -e "${BLUE}Testing Home Assistant MCP connection...${NC}"
-    if ! node "$MCP_DIR/homeassistant-mcp/dist/index.js" test; then
+    if ! bun run "$MCP_DIR/homeassistant-mcp/dist/stdio-server.js" 2>/dev/null; then
         echo -e "${RED}Home Assistant MCP test failed. Please check your configuration and try again.${NC}"
     else
         echo -e "${GREEN}Home Assistant MCP test successful!${NC}"

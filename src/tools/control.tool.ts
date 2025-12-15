@@ -40,9 +40,11 @@ export const controlTool: Tool = {
       .describe("Brightness level for lights (0-255)"),
     color_temp: z.number().optional().describe("Color temperature for lights"),
     rgb_color: z
-      .tuple([z.number(), z.number(), z.number()])
+      .array(z.number().min(0).max(255))
+      .min(3)
+      .max(3)
       .optional()
-      .describe("RGB color values"),
+      .describe("RGB color values as [r, g, b] array"),
     // Cover parameters
     position: z
       .number()

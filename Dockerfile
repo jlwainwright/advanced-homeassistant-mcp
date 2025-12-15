@@ -28,7 +28,7 @@ RUN /opt/venv/bin/python -m pip install --no-cache-dir numpy scipy
 
 # Copy package.json and install dependencies
 COPY package.json ./
-RUN bun install --frozen-lockfile || bun install
+RUN bun install --frozen-lockfile --ignore-scripts || bun install --ignore-scripts
 
 # Copy source files and build
 COPY src ./src
@@ -99,4 +99,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 EXPOSE ${PORT:-4000}
 
 # Start the application with audio setup
-CMD ["/bin/bash", "-c", "/app/docker/speech/setup-audio.sh || echo 'Audio setup failed, continuing anyway' && bun --smol run fix-env.js"] 
+CMD ["/bin/bash", "-c", "/app/docker/speech/setup-audio.sh || echo 'Audio setup failed, continuing anyway' && bun run dist/index.js"] 
